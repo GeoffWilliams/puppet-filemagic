@@ -1,6 +1,6 @@
 {
   "name": "geoffwilliams-filemagic",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "geoffwilliams",
   "summary": "Edit files the easy way using Puppet - like magic",
   "license": "Apache-2.0",
@@ -12,4 +12,3 @@
   ],
   "data_provider": null
 }
-

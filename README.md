@@ -23,7 +23,6 @@ Take for example the following situations:
 ## Features
 
 ### Planned
-* Append data to a file
 * Un-append data to a file
 * Make a file 'sandwich' (insert data into a point inside the file)
 * Un-make a file 'sandwich'
@@ -33,9 +32,13 @@ Take for example the following situations:
 
 ### Implemented
 
+#### fm_append
+* Append data to a file
+* Un-append data to a file
+
 #### fm_prepend
-* Prepend lines to a file
-* Un-prepend lines to a file
+* Prepend data to a file
+* Un-prepend data to a file
 
 ## Setup
 * There is no setup and FileMagic is cross platform!  Please [create an issue](https://github.com/GeoffWilliams/puppet-filemagic/issues/new) if you find this not to be the case.

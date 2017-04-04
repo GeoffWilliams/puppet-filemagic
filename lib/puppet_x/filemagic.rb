@@ -17,6 +17,13 @@ module PuppetX
       # IO readlines keeps the newlines and IO writelines strips them - can't
       # eat its own dogfood so we need to write our own here...
       file_lines = File.readlines(filename).each {|l| l.chomp!}
+
+      # reverse match order if we are checking the end of the file
+      if position > 0
+        data_lines = data_lines.reverse
+        file_lines = file_lines.reverse
+      end
+
       # check-off that each line in our data is already in the file
       i = 0
       while exists and i < data_lines.size
@@ -64,6 +71,19 @@ module PuppetX
       # write the new content in one go
       File.open(filename, "w+") do |f|
         f.puts(data2lines(data))
+      end
+    end
+
+    def self.unappend(filename, data)
+      content = File.readlines(filename).each {|l| l.chomp!}
+      data2lines(data).reverse.each { |line|
+        if content[-1] == line
+          content.pop
+        end
+      }
+      # write the new content in one go
+      File.open(filename, "w") do |f|
+        f.puts(content)
       end
     end
 
