@@ -1,0 +1,15 @@
+{
+  "name": "geoffwilliams-filemagic",
+  "version": "0.1.0",
+  "author": "geoffwilliams",
+  "summary": "Edit files the easy way using Puppet - like magic",
+  "license": "Apache-2.0",
+  "source": "https://github.com/GeoffWilliams/puppet-filemagic",
+  "project_page": "https://github.com/GeoffWilliams/puppet-filemagic",
+  "issues_url": "https://github.com/GeoffWilliams/puppet-filemagic/issues",
+  "dependencies": [
+    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
+  ],
+  "data_provider": null
+}
+
