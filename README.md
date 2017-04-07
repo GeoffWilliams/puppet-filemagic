@@ -23,7 +23,6 @@ Take for example the following situations:
 ## Features
 
 ### Planned
-* Un-append data to a file
 * Make a file 'sandwich' (insert data into a point inside the file)
 * Un-make a file 'sandwich'
 * Find and replace
@@ -35,10 +34,12 @@ Take for example the following situations:
 #### fm_append
 * Append data to a file
 * Un-append data to a file
+* Specify `match_start` - The first line of input to append from, for cases where some data already exists
 
 #### fm_prepend
 * Prepend data to a file
 * Un-prepend data to a file
+* Specify `match_end` - The last line of input to prepend to, for cases where some data already exists
 
 ## Setup
 * There is no setup and FileMagic is cross platform!  Please [create an issue](https://github.com/GeoffWilliams/puppet-filemagic/issues/new) if you find this not to be the case.

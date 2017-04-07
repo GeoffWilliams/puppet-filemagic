@@ -1,9 +1,14 @@
-@test "First 2 lines match new data" {
-  HEADER=$(head -2 /tmp/fm_prepend.txt)
+@test "First 3 lines match new data" {
+  HEADER=$(head -3 /tmp/fm_prepend.txt)
   # must use literal LF - bash won't match \n
-  WANTED='First line
-Second line'
+  WANTED='# prepend this
+aaa=bbb
+EOF'
   [ "$HEADER" = "$WANTED" ]
+}
+
+@test "stale aaa value gone" {
+  ! grep 'aaa=xxx' /tmp/fm_prepend.txt
 }
 
 @test "body start intact" {

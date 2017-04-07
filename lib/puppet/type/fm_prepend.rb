@@ -17,6 +17,13 @@ Puppet::Type.newtype(:fm_prepend) do
     isrequired
   end
 
+  newparam(:match_end) do
+    desc "If specified, remove the line matching this regexp and all previous lines, then prepend `data`"
+    isrequired
+
+    defaultto false
+  end
+
   # require any puppet native file resource of the same path first
   autorequire :file do
     [ self[:path] ]
