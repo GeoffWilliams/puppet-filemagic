@@ -44,12 +44,8 @@ Take for example the following situations:
 ## Setup
 * There is no setup and FileMagic is cross platform!  Please [create an issue](https://github.com/GeoffWilliams/puppet-filemagic/issues/new) if you find this not to be the case.
 
-
 ## Usage
-
-This section is where you describe how to customize, configure, and do the
-fancy stuff with your module here. It's especially helpful if you include usage
-examples and code samples for doing things with your module.
+See reference and examples
 
 ## Reference
 [generated documentation](https://rawgit.com/GeoffWilliams/puppet-filemagic/master/doc/index.html).
