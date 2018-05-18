@@ -67,4 +67,11 @@ describe PuppetX::FileMagic do
     expect(PuppetX::FileMagic::get_match([], false, false)).to be -1
   end
 
+  it 'exists? returns false when replacements already applied' do
+    expect(PuppetX::FileMagic::exists?(TESTCASE[:replaced], TESTCASE[:data], 'gonsky', +1, :present)).to be false
+  end
+
+  it 'exists? returns true when replacements are needed' do
+    expect(PuppetX::FileMagic::exists?(TESTCASE[:needs_replace], TESTCASE[:data], 'needs replace', +1, :replace)).to be true
+  end
 end

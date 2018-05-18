@@ -5,5 +5,7 @@ TESTCASE = {
   :unmerged         => File.join('spec', 'fixtures', 'testcase', 'unmerged.txt'),
   :partial_append   => File.join('spec', 'fixtures', 'testcase', 'partial_append.txt'),
   :partial_prepend  => File.join('spec', 'fixtures', 'testcase', 'partial_prepend.txt'),
+  :replaced         => File.join('spec', 'fixtures', 'testcase', 'replaced.txt'),
+  :needs_replace    => File.join('spec', 'fixtures', 'testcase', 'needs_replace.txt'),
   :data             => "Line 1\nLine 2",
 }
