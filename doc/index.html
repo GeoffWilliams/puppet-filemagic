@@ -6,7 +6,7 @@
 <title>
   File: README
   
-    &mdash; Documentation by YARD 0.9.8
+    &mdash; Documentation by YARD 0.9.12
   
 </title>
 
@@ -65,19 +65,19 @@ src="https://travis-ci.org/GeoffWilliams/puppet-filemagic.svg?branch=master"></a
 
 <h4 id="label-Table+of+Contents">Table of Contents</h4>
 <ol><li>
-<p><a href="#description">Description</a></p>
+<p><a href="#label-Description">Description</a></p>
 </li><li>
-<p><a href="#setup">Setup - The basics of getting started with filemagic</a></p>
+<p><a href="#label-Setup">Setup - The basics of getting started with filemagic</a></p>
 </li><li>
-<p><a href="#usage">Usage - Configuration options and additional
+<p><a href="#label-Usage">Usage - Configuration options and additional
 functionality</a></p>
 </li><li>
-<p><a href="#reference">Reference - An under-the-hood peek at what the module
+<p><a href="#label-Reference">Reference - An under-the-hood peek at what the module
 is doing and how</a></p>
 </li><li>
-<p><a href="#limitations">Limitations - OS compatibility, etc.</a></p>
+<p><a href="#label-Limitations">Limitations - OS compatibility, etc.</a></p>
 </li><li>
-<p><a href="#development">Development - Guide for contributing to the
+<p><a href="#label-Development">Development - Guide for contributing to the
 module</a></p>
 </li></ol>
 
@@ -97,8 +97,6 @@ You need to do really simple edit(s)!</p>
 
 <h3 id="label-Planned">Planned</h3>
 <ul><li>
-<p>Un-append data to a file</p>
-</li><li>
 <p>Make a file &#39;sandwich&#39; (insert data into a point inside the file)</p>
 </li><li>
 <p>Un-make a file &#39;sandwich&#39;</p>
@@ -117,6 +115,9 @@ You need to do really simple edit(s)!</p>
 <p>Append data to a file</p>
 </li><li>
 <p>Un-append data to a file</p>
+</li><li>
+<p>Specify <code>match_start</code> - The first line of input to append from,
+for cases where some data already exists</p>
 </li></ul>
 
 <h4 id="label-fm_prepend">fm_prepend</h4>
@@ -124,6 +125,9 @@ You need to do really simple edit(s)!</p>
 <p>Prepend data to a file</p>
 </li><li>
 <p>Un-prepend data to a file</p>
+</li><li>
+<p>Specify <code>match_end</code> - The last line of input to prepend to, for
+cases where some data already exists</p>
 </li></ul>
 
 <h2 id="label-Setup">Setup</h2>
@@ -135,9 +139,7 @@ an issue</a> if you find this not to be the case.</p>
 
 <h2 id="label-Usage">Usage</h2>
 
-<p>This section is where you describe how to customize, configure, and do the
-fancy stuff with your module here. It&#39;s especially helpful if you
-include usage examples and code samples for doing things with your module.</p>
+<p>See reference and examples</p>
 
 <h2 id="label-Reference">Reference</h2>
 
