@@ -18,6 +18,7 @@ Take for example the following situations:
 * Your maintaining a fleet of brownfield production machines with an unknown state
 * You must follow your installation orders and they say to edit, not replace files
 * Files shared between multiple 'owners' e.g., modules, people, programs, etc
+* You don't want to fully template a file in order to receive upstream fixes
 * You need to do really simple edit(s)!
 
 ## Features
@@ -25,7 +26,6 @@ Take for example the following situations:
 ### Planned
 * Make a file 'sandwich' (insert data into a point inside the file)
 * Un-make a file 'sandwich'
-* Find and replace
 * Delete
 * Comment (not *ML)
 
@@ -40,6 +40,11 @@ Take for example the following situations:
 * Prepend data to a file
 * Un-prepend data to a file
 * Specify `match_end` - The last line of input to prepend to, for cases where some data already exists
+
+#### fm_replace
+* Find and replace lines of data in a file
+* Un-replace (delete) matching lines
+* Matches all instances of the `match` regexp and replaces/deletes as requested
 
 ## Setup
 * There is no setup and FileMagic is cross platform!  Please [create an issue](https://github.com/GeoffWilliams/puppet-filemagic/issues/new) if you find this not to be the case.
