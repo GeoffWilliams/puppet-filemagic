@@ -28,6 +28,7 @@ Take for example the following situations:
 * Un-make a file 'sandwich'
 * Delete
 * Comment (not *ML)
+* Global find and replace (gsub)
 
 ### Implemented
 
