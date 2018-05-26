@@ -253,5 +253,34 @@ module PuppetX
       end
 
     end
+
+    def self.regex_exists?(filename, regex, flags, check_type)
+      _regex = Regexp.new(regex, flags)
+      found =
+          if _regex.match(File.read(filename))
+            true
+          else
+            false
+          end
+
+      exists =
+          if check_type == :replace
+            ! found
+          elsif check_type == :absent
+            found
+          end
+
+
+    end
+
+    def self.gsub_match(filename, regex, flags, data)
+      content = File.read(filename)
+      _regex = Regexp.new(regex, flags)
+      content = content.gsub(_regex, data)
+      File.open(filename, "w") do |f|
+        f.puts(content)
+      end
+    end
+
   end
 end

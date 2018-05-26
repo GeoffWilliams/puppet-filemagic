@@ -28,7 +28,6 @@ Take for example the following situations:
 * Un-make a file 'sandwich'
 * Delete
 * Comment (not *ML)
-* Global find and replace (gsub)
 
 ### Implemented
 
@@ -36,6 +35,10 @@ Take for example the following situations:
 * Append data to a file
 * Un-append data to a file
 * Specify `match_start` - The first line of input to append from, for cases where some data already exists
+
+#### fm_gsub
+* Replace a regular expression
+* Delete a regular expression
 
 #### fm_prepend
 * Prepend data to a file
