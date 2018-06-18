@@ -62,7 +62,7 @@ module PuppetX
     # @param position Where to look for a match - -1 top of file, 0 sandwich,
     #   +1 bottom of file
     # @param check_type what kind of check are we doing?  :present, :absent
-    def self.exists?(filename, data, regex, position, check_type)
+    def self.exists?(filename, data, regex, position, check_type, flags=nil)
       exists = true
       data_lines = data2lines(data)
 
@@ -100,7 +100,9 @@ module PuppetX
         elsif check_type == :replace
           needs_replace = false
           data_lines.each { |line|
-            if line =~ /#{regex}/ or line == data
+            _regex = Regexp.new(regex, flags)
+
+            if _regex.match?(line) or line == data
               needs_replace = true
             end
 
@@ -225,9 +227,10 @@ module PuppetX
     end
 
 
-    def self.remove_match(filename, regex)
+    def self.remove_match(filename, regex, flags=nil)
       content = File.readlines(filename).reject { |line|
-        line =~ /#{regex}/
+        _regex = Regexp.new(regex, flags)
+        _regex.match?(line)
       }
       File.open(filename, "w") do |f|
         f.puts(content)
@@ -235,11 +238,13 @@ module PuppetX
 
     end
 
-    def self.replace_match(filename, regex, data)
+    def self.replace_match(filename, regex, data, flags=nil)
       content = []
       matched = false
       File.readlines(filename).each { |line|
-        if line =~ /#{regex}/
+        _regex = Regexp.new(regex, flags)
+
+        if _regex.match?(line)
           if ! matched
             content << line.gsub(regex, data)
             matched = true
