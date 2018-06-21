@@ -8,7 +8,7 @@
 }
 
 @test "line 3 gone" {
-  grep -v 'EOF' /tmp/fm_prepend.txt
+  grep -v 'end of prepended data' /tmp/fm_prepend.txt
 }
 
 @test "body start intact" {

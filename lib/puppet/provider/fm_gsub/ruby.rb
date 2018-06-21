@@ -2,12 +2,7 @@ require 'puppet_x'
 require 'puppet_x/filemagic'
 Puppet::Type.type(:fm_gsub).provide(:ruby) do
   def exists?
-    check_type = if @resource['ensure'] == :absent
-                   :absent
-                 else
-                   :replace
-                 end
-    PuppetX::FileMagic::regex_exists?(@resource['path'], @resource['match'], @resource['flags'], check_type)
+    PuppetX::FileMagic::exists?(@resource['path'], @resource['data'], @resource['match'], @resource['flags'], :gsub, (@resource['ensure'] == :absent))
   end
 
   def create

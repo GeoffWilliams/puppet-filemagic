@@ -10,3 +10,7 @@
 @test "unmatched line left alone" {
     grep "no remove" /tmp/foo.txt
 }
+
+@test "line inserted" {
+    grep "line inserted" /tmp/foo.txt
+}

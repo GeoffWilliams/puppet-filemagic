@@ -84,7 +84,9 @@
   <div class="discussion">
     
 <p>Replace one instance of /regex/ in a text file with <code>data</code> and
-remove all other instances</p>
+remove all other instances. Note that this works like a line-by-line find
+and replace. If there is nothing to replace then no change will be made!
+(use file_line for that)</p>
 
   </div>
 </div>
@@ -147,6 +149,40 @@ remove all other instances</p>
           
 <p>Lines to add to the file - accepts string or array. If n present newlines
 will be inserted</p>
+
+        </div>
+      </div>
+      
+      
+    </li>
+    
+    <li>
+      <span class="name">flags</span>
+      
+      
+      <div class="docstring">
+        <div class="discussion">
+          
+<p>Regexp flags</p>
+
+        </div>
+      </div>
+      
+      
+    </li>
+    
+    <li>
+      <span class="name">insert_if_missing</span>
+      
+      <span class="default"> (defaults to: <em>false</em>)</span>
+      
+      
+      <div class="docstring">
+        <div class="discussion">
+          
+<p>If <code>true</code>, always ensure that <code>data</code> is added to
+file, even if this involves inserting a new line instead of replacing a
+match</p>
 
         </div>
       </div>

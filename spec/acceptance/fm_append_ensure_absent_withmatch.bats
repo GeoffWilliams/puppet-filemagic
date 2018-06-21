@@ -3,7 +3,7 @@
 }
 
 @test "line 3 gone" {
-  grep -v 'EOF' /tmp/fm_append.txt
+  grep -v 'end of appended data' /tmp/fm_append.txt
 }
 
 @test "body start intact" {

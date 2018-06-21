@@ -1,12 +1,35 @@
 require 'puppet_x'
 module PuppetX
   module FileMagic
+
+    # read the first line of file to determine it's line endings
+    def self.determine_line_ending(path)
+      File.open(path, 'r') do |file|
+        return file.readline[/\r?\n$/]
+      end
+    end
+
+
     def self.data2lines(data)
-      if data.class == String
-        data = data.split("\n")
+      if data.nil? || data.empty?
+        lines = []
+      else
+        # support windows by chomping (CR)LF for comparison purposes
+        lines = data.split(/\r?\n/)
       end
 
-      data
+      lines
+    end
+
+    # read a text file and get rid of newlines
+    def self.readfile(path)
+      if File.exists?(path)
+        file_lines = File.readlines(path).each {|l| l.chomp!}
+      else
+        Puppet.error("FileMagic unable to find file at #{path} - make sure it exists")
+        file_lines = []
+      end
+      file_lines
     end
 
     # return the index of the first/last match of `regex` in `lines` or -1 if no
@@ -16,27 +39,28 @@ module PuppetX
     # @param lines data to search
     # @param regex regex to match
     # @param first match the first instance? otherwise match the last
-    def self.get_match(lines, regex, first)
+    def self.get_match_regex(lines, regex, flags, first)
       found_at = -1
       if regex
+        # parse the string from puppet into a real ruby regex. Flags have to be separate for this
+        _regex = Regexp.new(regex, flags)
         i = 0
 
         if ! first
           lines = lines.reverse
         end
 
-        while found_at == -1 and i < lines.size
-          # puppet passes regex's as strings to ruby even regex is a primative
-          # now.  Hands up who's suprised by that
-          real_regex = Regexp.new regex
-          if lines[i] =~ real_regex
+        while found_at == -1 && i < lines.size
+          if _regex.match?(lines[i])
             found_at = i
           end
           i += 1
         end
 
-        if !first and found_at > -1
+        if !first && found_at > -1
           # need to correct the index since we reversed the array we searched
+          #
+          # `V` points to the element we want in the array of `X`s
           #
           #      V = 5
           # XXXXXXX size == 7
@@ -51,106 +75,154 @@ module PuppetX
       found_at
     end
 
+    # Return a count of matching lines from the file
+    # @param pos -1 match from beginning, 0 match from anywhere, 1 match fom end
+    # @return -1 if all lines matched in correct order otherwise count of matching lines
+    def self.get_match_lines(file_lines, data_lines, pos)
+      exact_lines_matched = 0
+
+      # use a separate variable for file_lines to do exact vs partial match as we must
+      # start matching a different points for each test
+
+      if pos == 1
+        # reverse match order if we are checking the end of the file
+        data_lines = data_lines.reverse
+        file_lines_exact = file_lines.reverse if file_lines
+      elsif pos == 0 and data_lines.size > 0
+        # scan through `file_lines` to find the fist line from data_lines and start there (or nowhere if its not found)
+        index = file_lines.find_index(data_lines[0]) || [file_lines.size() -1, 0].max
+        file_lines_exact = file_lines[index, data_lines.size]
+      else
+        file_lines_exact = file_lines
+      end
+
+      # check-off that each line in our data is already in the file, in the exact correct position
+      # and short-circuit if file is too short to possibly match
+      i = 0
+      while file_lines_exact.size >= data_lines.size && i < data_lines.size
+        data_line = data_lines[i]
+        file_line = file_lines_exact[i]
+
+        if file_line == data_line
+          exact_lines_matched += 1
+        end
+
+        i += 1
+      end
+
+      if exact_lines_matched == data_lines.size and data_lines.size > 0
+        # -1 indicates all lines matched
+        lines_matched = -1
+      else
+        partial_matches = 0
+        file_lines.each { |file_line|
+          data_lines.each { |data_line|
+            if file_line == data_line
+              partial_matches += 1
+            end
+          }
+        }
+        lines_matched = partial_matches
+      end
+
+      lines_matched
+    end
+
     # sandwich position not implemented yet
     # -1 TOP OF file
     # 0 SANDWICH
     # +1 END OF FILE
-    # @param filename File to inspect
-    # @param data Lines of data to look for.  If \n character found, newlines
+    # @param path File to inspect
+    # @param data Lines of data to look for.  If (CR)LF character found, newlines
     #   will be inserted or you can just pass an array
     # @param regex Regular expression to match or false to skip
     # @param position Where to look for a match - -1 top of file, 0 sandwich,
     #   +1 bottom of file
     # @param check_type what kind of check are we doing?  :present, :absent
-    def self.exists?(filename, data, regex, position, check_type, flags=nil)
-      exists = true
+    def self.exists?(path, data, regex, flags, check_type, check_for_absent)
       data_lines = data2lines(data)
-
-      # IO readlines keeps the newlines and IO writelines strips them - can't
-      # eat its own dogfood so we need to write our own here...
-      if ! File.exist?(filename)
-        Puppet.err("File missing at #{filename} (file must already exist to do filemagic on it...)")
-        exists = if check_type == :absent
-                   false
-                 else
-                   true
-                 end
-      else
-        file_lines = File.readlines(filename).each {|l| l.chomp!}
-
-        if check_type == :absent
-          found = false
-          if regex and get_match(file_lines, regex, true) > -1
-            found = true
-          end
-          
-          
-          file_lines.each {|l|
-            if data_lines
-              data_lines.each { |d|
-                if l==d
-                  found = true
-                end
-              }
-            end
-          }
-
-          exists = found
-
-        elsif check_type == :replace
-          needs_replace = false
-          data_lines.each { |line|
-            _regex = Regexp.new(regex, flags)
-
-            if _regex.match?(line) or line == data
-              needs_replace = true
-            end
-
-            exists = exists and needs_replace
-          }
-
-        else
-
-          # Test 1:  Exact match
-          # reverse match order if we are checking the end of the file
-          if position > 0
-            data_lines = data_lines.reverse
-            file_lines = file_lines.reverse
-          end
-
-          # check-off that each line in our data is already in the file
-          i = 0
-          while exists and data_lines and i < data_lines.size
-            data_line = data_lines[i]
-            file_line = file_lines[i]
-
-            if file_line != data_line
-              exists = false
-            end
-            i += 1
-          end
-
-          # Test 2 (optional): We may still exist based on the presence/absence of
-          # a regex in the file.  At this point our exists? status depends on whether
-          # we are being ensured :present or :absent -- if we are supposed to be
-          # :present, then a regex match without an exact match means we need to
-          # update the file to update it, whereas :absent means that we should clean
-          # out the old value to make the file identical to if we had added new data
-          # and then removed it.
-
-          # Test 3: if the regex matches any lines in the file then we need to run
-          # so that we can nuke them all and rewrite
-        end
+      if ! check_for_absent && data_lines.size == 0
+        raise "you must supply a valid string of `data` to check for"
       end
 
+      if ! File.exist?(path)
+        Puppet.err("File missing at #{path} (file must already exist to do filemagic on it...)")
+
+        # cannot possibly exist if it doesn't exist
+        exists = false
+      else
+        file_lines = readfile(path)
+        case check_type
+        when :append, :prepend
+          # Check for an exact match on `data` at the beginning or end of file
+          pos = if check_type == :prepend
+                  -1
+                else
+                  1
+                end
+          all_lines_matched = (get_match_lines(file_lines, data_lines, pos) == -1)
+
+          if ! all_lines_matched
+            # if all lines didn't match there might me a regex we need to scan for
+            if regex
+              partial_match = (get_match_regex(file_lines, regex, flags, true) > -1)
+            end
+
+            # Nothing found by regex.. last check - do we have a partial match on any data?
+            if ! partial_match
+              partial_match = (get_match_lines(file_lines, data_lines, pos) > 0)
+            end
+          else
+            partial_match = false
+          end
+
+          if all_lines_matched
+            exists = true
+          elsif partial_match
+            exists = check_for_absent
+          else
+            exists = false
+          end
+
+
+        when :gsub
+          exists =
+              if (get_match_regex(file_lines, regex, flags, true) > -1)
+                check_for_absent
+              else
+                ! check_for_absent
+              end
+        when :replace, :replace_insert
+          # If we find `regex` anywhere in file we need to fire (ensure=>present --> exists=false)
+          match_count = get_match_regex(file_lines, regex, flags, true)
+
+          if match_count == -1
+
+            if check_for_absent
+              # detect exact or partial match on data that needs to be removed
+              exists = (get_match_lines(file_lines, data_lines, 0) != 0)
+            elsif check_type == :replace_insert
+              # detect full match against data
+              exists = (get_match_lines(file_lines, data_lines, 0) == -1)
+            else
+              # we 'exist' because all necessary replacements have been made
+              exists = true
+            end
+          else
+            exists = check_for_absent
+          end
+        else
+          raise "Unsupported check type #{check_type}"
+        end
+      end
 
       exists
     end
 
-    def self.prepend(filename, regex_end, data)
+    def self.prepend(path, regex_end, flags, data)
       # read the old content into an array and prepend the required lines
-      content = File.readlines(filename).each {|l| l.chomp!}
-      found_at = get_match(content, regex_end, false)
+      content = readfile(path)
+      found_at = get_match_regex(content, regex_end, flags, false)
       if found_at > -1
         # Discard from the beginning of the file all lines before and including content[found_at]
         content = content[found_at+1..content.size-1]
@@ -160,15 +232,15 @@ module PuppetX
       content.unshift(data2lines(data))
 
       # write the new content in one go
-      File.open(filename, "w") do |f|
+      File.open(path, "w") do |f|
         f.puts(content)
       end
     end
 
-    def self.unprepend(filename, regex_end, data)
+    def self.unprepend(path, regex_end, flags, data)
       # read the old content into an array and remove the required lines
-      content = File.readlines(filename).each {|l| l.chomp!}
-      found_at = get_match(content, regex_end, false)
+      content = readfile(path)
+      found_at = get_match_regex(content, regex_end, flags,false)
       if found_at > -1
         # Discard from the beginning of the file all lines before and including content[found_at]
         content = content[found_at+1..content.size-1]
@@ -184,15 +256,15 @@ module PuppetX
         }
       end
       # write the new content in one go
-      File.open(filename, "w") do |f|
+      File.open(path, "w") do |f|
         f.puts(content)
       end
     end
 
-    def self.append(filename, regex_start, data)
+    def self.append(path, regex_start, flags, data)
       # write the new content in one go
-      content = File.readlines(filename).each {|l| l.chomp!}
-      found_at = get_match(content, regex_start, true)
+      content = readfile(path)
+      found_at = get_match_regex(content, regex_start, flags,true)
 
       if found_at > -1
         # Discard from the end of the file all lines including and after content[found_at]
@@ -202,87 +274,84 @@ module PuppetX
       # perform the append
       content += data2lines(data)
 
-      File.open(filename, "w") do |f|
+      File.open(path, "w") do |f|
         f.puts(content)
       end
     end
 
-    def self.unappend(filename, regex_start, data)
-      content = File.readlines(filename).each {|l| l.chomp!}
-      found_at = get_match(content, regex_start, true)
+    def self.unappend(path, regex_start, flags, data)
+      content = readfile(path)
+      found_at = get_match_regex(content, regex_start, flags, true)
       if found_at > -1
+        # Delete based on regexp (match)
+        #
         # Discard from the end of the file all lines including and after content[found_at]
         content = content[0..found_at-1]
       else
-        data2lines(data).reverse.each { |line|
-          if content[-1] == line
-            content.pop
-          end
-        }
+        # Delete based on exact match for `data`
+        lines = data2lines(data)
+        if lines
+          data2lines(data).reverse.each { |line|
+            if content[-1].strip == line.strip
+              content.pop
+            end
+          }
+        end
       end
       # write the new content in one go
-      File.open(filename, "w") do |f|
+      File.open(path, "w") do |f|
         f.puts(content)
       end
     end
 
 
-    def self.remove_match(filename, regex, flags=nil)
-      content = File.readlines(filename).reject { |line|
+    def self.remove_match(path, regex, flags)
+      content = readfile(path).reject { |line|
         _regex = Regexp.new(regex, flags)
         _regex.match?(line)
       }
-      File.open(filename, "w") do |f|
+      File.open(path, "w") do |f|
         f.puts(content)
       end
 
     end
 
-    def self.replace_match(filename, regex, data, flags=nil)
+    def self.replace_match(path, regex, flags, data, insert_if_missing)
       content = []
-      matched = false
-      File.readlines(filename).each { |line|
+      inserted = false
+      found = false
+      readfile(path).each { |line|
         _regex = Regexp.new(regex, flags)
 
         if _regex.match?(line)
-          if ! matched
+          if ! inserted
             content << line.gsub(regex, data)
-            matched = true
+            inserted = true
           end
         else
+          if line == data
+            found = true
+          end
           content << line
         end
       }
-      File.open(filename, "w") do |f|
+
+      if insert_if_missing && (! (found || inserted))
+        content << data
+      end
+
+      File.open(path, "w") do |f|
         f.puts(content)
       end
 
     end
 
-    def self.regex_exists?(filename, regex, flags, check_type)
-      _regex = Regexp.new(regex, flags)
-      found =
-          if _regex.match(File.read(filename))
-            true
-          else
-            false
-          end
-
-      exists =
-          if check_type == :replace
-            ! found
-          elsif check_type == :absent
-            found
-          end
-
-
-    end
-
-    def self.gsub_match(filename, regex, flags, data)
-      content = File.read(filename)
+    def self.gsub_match(path, regex, flags, data)
+      # Read the file and flatten it based on the FILE's encoding (not the os...)
+      content = readfile(path).join(determine_line_ending(path))
       _regex = Regexp.new(regex, flags)
       content = content.gsub(_regex, data)
-      File.open(filename, "w") do |f|
+      File.open(path, "w") do |f|
         f.puts(content)
       end
     end

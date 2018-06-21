@@ -17,7 +17,7 @@ Puppet::Type.newtype(:fm_gsub) do
     isrequired
   end
 
-  newparam(:match) do
+  newparam(:match, :namevar => :true) do
     desc "Target regexp to search for"
     isrequired
 
@@ -27,7 +27,9 @@ Puppet::Type.newtype(:fm_gsub) do
   newparam(:flags) do
     desc "Regexp flags"
 
-    defaultto ""
+    defaultto do
+      nil
+    end
   end
 
   # require any puppet native file resource of the same path first
@@ -35,4 +37,10 @@ Puppet::Type.newtype(:fm_gsub) do
     [ self[:path] ]
   end
 
+  def self.title_patterns
+    [
+        [ /(^(.*)$)/m,
+          [ [:path] ] ],
+    ]
+    end
 end

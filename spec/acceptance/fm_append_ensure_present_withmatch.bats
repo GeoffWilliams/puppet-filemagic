@@ -3,7 +3,7 @@
   # must use literal LF - bash won't match \n
   WANTED='# append this
 aaa=bbb
-EOF'
+end of appended data'
   [ "$FOOTER" = "$WANTED" ]
 }
 

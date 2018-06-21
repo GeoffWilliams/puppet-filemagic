@@ -3,7 +3,7 @@
   # must use literal LF - bash won't match \n
   WANTED='# prepend this
 aaa=bbb
-EOF'
+end of prepended data'
   [ "$HEADER" = "$WANTED" ]
 }
 

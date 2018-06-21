@@ -1,6 +1,7 @@
-cat > /tmp/foo.txt << EOF
+cat > /tmp/foo.txt << END
 remove this line
 no remove
 remove this line
 remove this line
-EOF
+remove also line
+END

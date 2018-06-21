@@ -24,6 +24,15 @@ Puppet::Type.newtype(:fm_append) do
     defaultto false
   end
 
+  newparam(:flags) do
+    desc "Regexp flags"
+
+    defaultto do
+      nil
+    end
+  end
+
+
   # require any puppet native file resource of the same path first
   autorequire :file do
     [ self[:path] ]
