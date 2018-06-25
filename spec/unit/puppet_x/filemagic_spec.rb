@@ -228,19 +228,23 @@ describe PuppetX::FileMagic do
   #
   context "get_match_regex function" do
     it 'finds the index of the first match' do
-      expect(PuppetX::FileMagic::get_match_regex(['a','b','c','b','a'], 'b', nil, true)).to be 1
+      expect(PuppetX::FileMagic::get_match_regex(['a','b','c','b','a'], 'b', nil, true, [])).to be 1
     end
 
     it 'finds the index of the last match' do
-      expect(PuppetX::FileMagic::get_match_regex(['a','b','c','b','a'], 'b', nil, false)).to be 3
+      expect(PuppetX::FileMagic::get_match_regex(['a','b','c','b','a'], 'b', nil, false, [])).to be 3
     end
 
     it 'returns -1 if no match' do
-      expect(PuppetX::FileMagic::get_match_regex(['a','b'], 'c', nil, false)).to be -1
+      expect(PuppetX::FileMagic::get_match_regex(['a','b'], 'c', nil, false, [])).to be -1
     end
 
     it 'returns -1 if no regex' do
-     expect(PuppetX::FileMagic::get_match_regex([], false, nil, false)).to be -1
+     expect(PuppetX::FileMagic::get_match_regex([], false, nil, false, [])).to be -1
+    end
+
+    it 'returns -1 if regex matches but is the same as data to replace with' do
+      expect(PuppetX::FileMagic::get_match_regex(['a', 'compress', 'b', 'c'], '^(no)?compress', nil, false, ['compress'])).to be -1
     end
   end
 

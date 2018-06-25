@@ -218,7 +218,7 @@ FILE.</p>
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#get_match_regex-class_method" title="get_match_regex (class method)">.<strong>get_match_regex</strong>(lines, regex, flags, first)  &#x21d2; Object </a>
+      <a href="#get_match_regex-class_method" title="get_match_regex (class method)">.<strong>get_match_regex</strong>(lines, regex, flags, first, data_lines)  &#x21d2; Object </a>
     
 
     
@@ -420,31 +420,31 @@ FILE.</p>
       <pre class="lines">
 
 
-264
-265
-266
-267
-268
-269
-270
-271
-272
-273
-274
-275
-276
-277
-278
-279
-280</pre>
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 264</span>
+      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 284</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_append'>append</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_regex_start'>regex_start</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
   <span class='comment'># write the new content in one go
 </span>  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_readfile'>readfile</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>=</span> <span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_regex_start'>regex_start</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span><span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>=</span> <span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_regex_start'>regex_start</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span><span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_data2lines'>data2lines</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span><span class='rparen'>)</span>
 
   <span class='kw'>if</span> <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>&gt;</span> <span class='op'>-</span><span class='int'>1</span>
     <span class='comment'># Discard from the end of the file all lines including and after content[found_at]
@@ -677,26 +677,6 @@ inserted or you can just pass an array</p>
       <pre class="lines">
 
 
-142
-143
-144
-145
-146
-147
-148
-149
-150
-151
-152
-153
-154
-155
-156
-157
-158
-159
-160
-161
 162
 163
 164
@@ -755,10 +735,30 @@ inserted or you can just pass an array</p>
 217
 218
 219
-220</pre>
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 142</span>
+      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 162</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_exists?'>exists?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='id identifier rubyid_check_type'>check_type</span><span class='comma'>,</span> <span class='id identifier rubyid_check_for_absent'>check_for_absent</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_data_lines'>data_lines</span> <span class='op'>=</span> <span class='id identifier rubyid_data2lines'>data2lines</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
@@ -786,7 +786,7 @@ inserted or you can just pass an array</p>
       <span class='kw'>if</span> <span class='op'>!</span> <span class='id identifier rubyid_all_lines_matched'>all_lines_matched</span>
         <span class='comment'># if all lines didn&#39;t match there might me a regex we need to scan for
 </span>        <span class='kw'>if</span> <span class='id identifier rubyid_regex'>regex</span>
-          <span class='id identifier rubyid_partial_match'>partial_match</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_file_lines'>file_lines</span><span class='comma'>,</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span> <span class='op'>&gt;</span> <span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span>
+          <span class='id identifier rubyid_partial_match'>partial_match</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_file_lines'>file_lines</span><span class='comma'>,</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_data_lines'>data_lines</span><span class='rparen'>)</span> <span class='op'>&gt;</span> <span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span>
         <span class='kw'>end</span>
 
         <span class='comment'># Nothing found by regex.. last check - do we have a partial match on any data?
@@ -808,14 +808,14 @@ inserted or you can just pass an array</p>
 
     <span class='kw'>when</span> <span class='symbol'>:gsub</span>
       <span class='id identifier rubyid_exists'>exists</span> <span class='op'>=</span>
-          <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_file_lines'>file_lines</span><span class='comma'>,</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span> <span class='op'>&gt;</span> <span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span>
+          <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_file_lines'>file_lines</span><span class='comma'>,</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_data_lines'>data_lines</span><span class='rparen'>)</span> <span class='op'>&gt;</span> <span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span>
             <span class='id identifier rubyid_check_for_absent'>check_for_absent</span>
           <span class='kw'>else</span>
             <span class='op'>!</span> <span class='id identifier rubyid_check_for_absent'>check_for_absent</span>
           <span class='kw'>end</span>
     <span class='kw'>when</span> <span class='symbol'>:replace</span><span class='comma'>,</span> <span class='symbol'>:replace_insert</span>
       <span class='comment'># If we find `regex` anywhere in file we need to fire (ensure=&gt;present --&gt; exists=false)
-</span>      <span class='id identifier rubyid_match_count'>match_count</span> <span class='op'>=</span> <span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_file_lines'>file_lines</span><span class='comma'>,</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span>
+</span>      <span class='id identifier rubyid_match_count'>match_count</span> <span class='op'>=</span> <span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_file_lines'>file_lines</span><span class='comma'>,</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_data_lines'>data_lines</span><span class='rparen'>)</span>
 
       <span class='kw'>if</span> <span class='id identifier rubyid_match_count'>match_count</span> <span class='op'>==</span> <span class='op'>-</span><span class='int'>1</span>
 
@@ -908,26 +908,6 @@ inserted or you can just pass an array</p>
       <pre class="lines">
 
 
-81
-82
-83
-84
-85
-86
-87
-88
-89
-90
-91
-92
-93
-94
-95
-96
-97
-98
-99
-100
 101
 102
 103
@@ -956,10 +936,30 @@ inserted or you can just pass an array</p>
 126
 127
 128
-129</pre>
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 81</span>
+      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 101</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_get_match_lines'>get_match_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_file_lines'>file_lines</span><span class='comma'>,</span> <span class='id identifier rubyid_data_lines'>data_lines</span><span class='comma'>,</span> <span class='id identifier rubyid_pos'>pos</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_exact_lines_matched'>exact_lines_matched</span> <span class='op'>=</span> <span class='int'>0</span>
@@ -1018,7 +1018,7 @@ inserted or you can just pass an array</p>
       <div class="method_details ">
   <h3 class="signature " id="get_match_regex-class_method">
   
-    .<strong>get_match_regex</strong>(lines, regex, flags, first)  &#x21d2; <tt>Object</tt> 
+    .<strong>get_match_regex</strong>(lines, regex, flags, first, data_lines)  &#x21d2; <tt>Object</tt> 
   
 
   
@@ -1130,13 +1130,34 @@ the first element of the array which is of course false</p>
 73
 74
 75
-76</pre>
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 42</span>
 
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='id identifier rubyid_first'>first</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='id identifier rubyid_first'>first</span><span class='comma'>,</span> <span class='id identifier rubyid_data_lines'>data_lines</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>1</span>
+
   <span class='kw'>if</span> <span class='id identifier rubyid_regex'>regex</span>
     <span class='comment'># parse the string from puppet into a real ruby regex. Flags have to be separate for this
 </span>    <span class='id identifier rubyid__regex'>_regex</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='rparen'>)</span>
@@ -1144,11 +1165,30 @@ the first element of the array which is of course false</p>
 
     <span class='kw'>if</span> <span class='op'>!</span> <span class='id identifier rubyid_first'>first</span>
       <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_reverse'>reverse</span>
+      <span class='id identifier rubyid_data_lines'>data_lines</span> <span class='op'>=</span> <span class='id identifier rubyid_data_lines'>data_lines</span><span class='period'>.</span><span class='id identifier rubyid_reverse'>reverse</span>
     <span class='kw'>end</span>
 
     <span class='kw'>while</span> <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>==</span> <span class='op'>-</span><span class='int'>1</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_i'>i</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+
       <span class='kw'>if</span> <span class='id identifier rubyid__regex'>_regex</span><span class='period'>.</span><span class='id identifier rubyid_match?'>match?</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_i'>i</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-        <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>=</span> <span class='id identifier rubyid_i'>i</span>
+        <span class='comment'># ignore matches that exactly match the data to be replaced to avoid getting stuck in a
+</span>        <span class='comment'># rewriting loop every puppet run (eg match `^(no)?compress`, data `compress`)
+</span>        <span class='comment'># check every line from here on in for exact match against data - if we get one
+</span>        <span class='comment'># then we didn&#39;t match...
+</span>        <span class='id identifier rubyid_j'>j</span> <span class='op'>=</span> <span class='int'>0</span>
+        <span class='id identifier rubyid_lines_matched'>lines_matched</span> <span class='op'>=</span> <span class='int'>0</span>
+        <span class='kw'>while</span> <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>==</span> <span class='op'>-</span><span class='int'>1</span> <span class='kw'>and</span> <span class='id identifier rubyid_j'>j</span> <span class='op'>&lt;</span> <span class='id identifier rubyid_data_lines'>data_lines</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+          <span class='kw'>if</span> <span class='id identifier rubyid_lines'>lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_i'>i</span><span class='op'>+</span><span class='id identifier rubyid_j'>j</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='id identifier rubyid_data_lines'>data_lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_j'>j</span><span class='rbracket'>]</span>
+            <span class='id identifier rubyid_lines_matched'>lines_matched</span> <span class='op'>+=</span> <span class='int'>1</span>
+          <span class='kw'>end</span>
+          <span class='id identifier rubyid_j'>j</span> <span class='op'>+=</span> <span class='int'>1</span>
+        <span class='kw'>end</span>
+
+        <span class='comment'># See if we got a 100% match after doing the full scan
+</span>        <span class='kw'>if</span> <span class='id identifier rubyid_lines_matched'>lines_matched</span> <span class='op'>!=</span> <span class='id identifier rubyid_data_lines'>data_lines</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='id identifier rubyid_data_lines'>data_lines</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>==</span> <span class='int'>0</span>
+          <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>=</span> <span class='id identifier rubyid_i'>i</span>
+        <span class='kw'>end</span>
+
       <span class='kw'>end</span>
       <span class='id identifier rubyid_i'>i</span> <span class='op'>+=</span> <span class='int'>1</span>
     <span class='kw'>end</span>
@@ -1190,18 +1230,18 @@ the first element of the array which is of course false</p>
       <pre class="lines">
 
 
-349
-350
-351
-352
-353
-354
-355
-356
-357</pre>
+370
+371
+372
+373
+374
+375
+376
+377
+378</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 349</span>
+      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 370</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_gsub_match'>gsub_match</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
   <span class='comment'># Read the file and flatten it based on the FILE&#39;s encoding (not the os...)
@@ -1232,31 +1272,31 @@ the first element of the array which is of course false</p>
       <pre class="lines">
 
 
-222
-223
-224
-225
-226
-227
-228
-229
-230
-231
-232
-233
-234
-235
-236
-237
-238</pre>
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 222</span>
+      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 242</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_prepend'>prepend</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_regex_end'>regex_end</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
   <span class='comment'># read the old content into an array and prepend the required lines
 </span>  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_readfile'>readfile</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>=</span> <span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_regex_end'>regex_end</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>=</span> <span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_regex_end'>regex_end</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='id identifier rubyid_data2lines'>data2lines</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>&gt;</span> <span class='op'>-</span><span class='int'>1</span>
     <span class='comment'># Discard from the beginning of the file all lines before and including content[found_at]
 </span>    <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='lbracket'>[</span><span class='id identifier rubyid_found_at'>found_at</span><span class='op'>+</span><span class='int'>1</span><span class='op'>..</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
@@ -1343,19 +1383,19 @@ the first element of the array which is of course false</p>
       <pre class="lines">
 
 
-308
-309
-310
-311
-312
-313
-314
-315
-316
-317</pre>
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 308</span>
+      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 328</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_remove_match'>remove_match</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_readfile'>readfile</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span>
@@ -1387,26 +1427,6 @@ the first element of the array which is of course false</p>
       <pre class="lines">
 
 
-319
-320
-321
-322
-323
-324
-325
-326
-327
-328
-329
-330
-331
-332
-333
-334
-335
-336
-337
-338
 339
 340
 341
@@ -1415,21 +1435,43 @@ the first element of the array which is of course false</p>
 344
 345
 346
-347</pre>
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 319</span>
+      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 339</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_replace_match'>replace_match</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_insert_if_missing'>insert_if_missing</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='id identifier rubyid_inserted'>inserted</span> <span class='op'>=</span> <span class='kw'>false</span>
   <span class='id identifier rubyid_found'>found</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='id identifier rubyid__regex'>_regex</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='rparen'>)</span>
+
   <span class='id identifier rubyid_readfile'>readfile</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='op'>|</span>
-    <span class='id identifier rubyid__regex'>_regex</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='rparen'>)</span>
 
     <span class='kw'>if</span> <span class='id identifier rubyid__regex'>_regex</span><span class='period'>.</span><span class='id identifier rubyid_match?'>match?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
       <span class='kw'>if</span> <span class='op'>!</span> <span class='id identifier rubyid_inserted'>inserted</span>
-        <span class='id identifier rubyid_content'>content</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='id identifier rubyid_regex'>regex</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_content'>content</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_data'>data</span>
         <span class='id identifier rubyid_inserted'>inserted</span> <span class='op'>=</span> <span class='kw'>true</span>
       <span class='kw'>end</span>
     <span class='kw'>else</span>
@@ -1469,37 +1511,37 @@ the first element of the array which is of course false</p>
       <pre class="lines">
 
 
-282
-283
-284
-285
-286
-287
-288
-289
-290
-291
-292
-293
-294
-295
-296
-297
-298
-299
-300
-301
 302
 303
 304
-305</pre>
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 282</span>
+      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 302</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_unappend'>unappend</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_regex_start'>regex_start</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_readfile'>readfile</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>=</span> <span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_regex_start'>regex_start</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>=</span> <span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_regex_start'>regex_start</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_data2lines'>data2lines</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>&gt;</span> <span class='op'>-</span><span class='int'>1</span>
     <span class='comment'># Delete based on regexp (match)
 </span>    <span class='comment'>#
@@ -1541,37 +1583,37 @@ the first element of the array which is of course false</p>
       <pre class="lines">
 
 
-240
-241
-242
-243
-244
-245
-246
-247
-248
-249
-250
-251
-252
-253
-254
-255
-256
-257
-258
-259
 260
 261
-262</pre>
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 240</span>
+      <pre class="code"><span class="info file"># File 'lib/puppet_x/filemagic.rb', line 260</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_unprepend'>unprepend</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_regex_end'>regex_end</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
   <span class='comment'># read the old content into an array and remove the required lines
 </span>  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_readfile'>readfile</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>=</span> <span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_regex_end'>regex_end</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span><span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>=</span> <span class='id identifier rubyid_get_match_regex'>get_match_regex</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_regex_end'>regex_end</span><span class='comma'>,</span> <span class='id identifier rubyid_flags'>flags</span><span class='comma'>,</span><span class='kw'>false</span><span class='comma'>,</span> <span class='id identifier rubyid_data2lines'>data2lines</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_found_at'>found_at</span> <span class='op'>&gt;</span> <span class='op'>-</span><span class='int'>1</span>
     <span class='comment'># Discard from the beginning of the file all lines before and including content[found_at]
 </span>    <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='lbracket'>[</span><span class='id identifier rubyid_found_at'>found_at</span><span class='op'>+</span><span class='int'>1</span><span class='op'>..</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>

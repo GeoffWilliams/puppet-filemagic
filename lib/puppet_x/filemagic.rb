@@ -39,8 +39,9 @@ module PuppetX
     # @param lines data to search
     # @param regex regex to match
     # @param first match the first instance? otherwise match the last
-    def self.get_match_regex(lines, regex, flags, first)
+    def self.get_match_regex(lines, regex, flags, first, data_lines)
       found_at = -1
+
       if regex
         # parse the string from puppet into a real ruby regex. Flags have to be separate for this
         _regex = Regexp.new(regex, flags)
@@ -48,11 +49,30 @@ module PuppetX
 
         if ! first
           lines = lines.reverse
+          data_lines = data_lines.reverse
         end
 
         while found_at == -1 && i < lines.size
+
           if _regex.match?(lines[i])
-            found_at = i
+            # ignore matches that exactly match the data to be replaced to avoid getting stuck in a
+            # rewriting loop every puppet run (eg match `^(no)?compress`, data `compress`)
+            # check every line from here on in for exact match against data - if we get one
+            # then we didn't match...
+            j = 0
+            lines_matched = 0
+            while found_at == -1 and j < data_lines.size
+              if lines[i+j] == data_lines[j]
+                lines_matched += 1
+              end
+              j += 1
+            end
+
+            # See if we got a 100% match after doing the full scan
+            if lines_matched != data_lines.size || data_lines.size == 0
+              found_at = i
+            end
+
           end
           i += 1
         end
@@ -165,7 +185,7 @@ module PuppetX
           if ! all_lines_matched
             # if all lines didn't match there might me a regex we need to scan for
             if regex
-              partial_match = (get_match_regex(file_lines, regex, flags, true) > -1)
+              partial_match = (get_match_regex(file_lines, regex, flags, true, data_lines) > -1)
             end
 
             # Nothing found by regex.. last check - do we have a partial match on any data?
@@ -187,14 +207,14 @@ module PuppetX
 
         when :gsub
           exists =
-              if (get_match_regex(file_lines, regex, flags, true) > -1)
+              if (get_match_regex(file_lines, regex, flags, true, data_lines) > -1)
                 check_for_absent
               else
                 ! check_for_absent
               end
         when :replace, :replace_insert
           # If we find `regex` anywhere in file we need to fire (ensure=>present --> exists=false)
-          match_count = get_match_regex(file_lines, regex, flags, true)
+          match_count = get_match_regex(file_lines, regex, flags, true, data_lines)
 
           if match_count == -1
 
@@ -222,7 +242,7 @@ module PuppetX
     def self.prepend(path, regex_end, flags, data)
       # read the old content into an array and prepend the required lines
       content = readfile(path)
-      found_at = get_match_regex(content, regex_end, flags, false)
+      found_at = get_match_regex(content, regex_end, flags, false, data2lines(data))
       if found_at > -1
         # Discard from the beginning of the file all lines before and including content[found_at]
         content = content[found_at+1..content.size-1]
@@ -240,7 +260,7 @@ module PuppetX
     def self.unprepend(path, regex_end, flags, data)
       # read the old content into an array and remove the required lines
       content = readfile(path)
-      found_at = get_match_regex(content, regex_end, flags,false)
+      found_at = get_match_regex(content, regex_end, flags,false, data2lines(data))
       if found_at > -1
         # Discard from the beginning of the file all lines before and including content[found_at]
         content = content[found_at+1..content.size-1]
@@ -264,7 +284,7 @@ module PuppetX
     def self.append(path, regex_start, flags, data)
       # write the new content in one go
       content = readfile(path)
-      found_at = get_match_regex(content, regex_start, flags,true)
+      found_at = get_match_regex(content, regex_start, flags,true, data2lines(data))
 
       if found_at > -1
         # Discard from the end of the file all lines including and after content[found_at]
@@ -281,7 +301,7 @@ module PuppetX
 
     def self.unappend(path, regex_start, flags, data)
       content = readfile(path)
-      found_at = get_match_regex(content, regex_start, flags, true)
+      found_at = get_match_regex(content, regex_start, flags, true, data2lines(data))
       if found_at > -1
         # Delete based on regexp (match)
         #
@@ -320,12 +340,13 @@ module PuppetX
       content = []
       inserted = false
       found = false
+      _regex = Regexp.new(regex, flags)
+
       readfile(path).each { |line|
-        _regex = Regexp.new(regex, flags)
 
         if _regex.match?(line)
           if ! inserted
-            content << line.gsub(regex, data)
+            content << data
             inserted = true
           end
         else
