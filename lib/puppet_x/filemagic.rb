@@ -336,7 +336,7 @@ module PuppetX
 
     end
 
-    def self.replace_match(path, regex, flags, data, insert_if_missing)
+    def self.replace_match(path, regex, flags, data, insert_if_missing, insert_at)
       content = []
       inserted = false
       found = false
@@ -358,7 +358,18 @@ module PuppetX
       }
 
       if insert_if_missing && (! (found || inserted))
-        content << data
+        case insert_at
+        when 'top'
+          insertion_point = 0
+        when 'bottom'
+          insertion_point = content.size
+        else
+          insertion_point = Integer(insert_at)
+          if insertion_point > content.size
+            Puppet.warning("#{path}: Requested insert line at #{insert_at} but there are only ")
+          end
+        end
+        content.insert(insertion_point, data)
       end
 
       File.open(path, "w") do |f|

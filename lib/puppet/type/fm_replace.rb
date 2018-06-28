@@ -39,6 +39,18 @@ like a line-by-line find and replace. If there is nothing to replace then no cha
     defaultto false
   end
 
+  newparam(:insert_at) do
+    desc "If `insert_if_missing` true and we need to do an insert, where should the data be inserted?
+      options are `top`, `bottom` or line number"
+
+    validate do |value|
+      if ! (value == 'top' or value == 'bottom' or Integer(value))
+        raise ArgumentError , "insert_at value must be `top`, `bottom` or zero-indexed line number but got: #{value}"
+      end
+    end
+    defaultto 'bottom'
+  end
+
 
   # require any puppet native file resource of the same path first
   autorequire :file do

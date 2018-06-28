@@ -12,7 +12,7 @@ Puppet::Type.type(:fm_replace).provide(:ruby) do
   end
 
   def create
-    PuppetX::FileMagic::replace_match(@resource['path'], @resource['match'], @resource['flags'], @resource['data'], @resource['insert_if_missing'])
+    PuppetX::FileMagic::replace_match(@resource['path'], @resource['match'], @resource['flags'], @resource['data'], @resource['insert_if_missing'], @resource['insert_at'])
   end
 
   def destroy
