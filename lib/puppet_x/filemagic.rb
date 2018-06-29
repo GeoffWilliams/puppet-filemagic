@@ -364,9 +364,13 @@ module PuppetX
         when 'bottom'
           insertion_point = content.size
         else
-          insertion_point = Integer(insert_at)
-          if insertion_point > content.size
-            Puppet.warning("#{path}: Requested insert line at #{insert_at} but there are only ")
+          line_no = Integer(insert_at)
+          if line_no > content.size
+            Puppet.warning(
+                "#{path}: Cannot insert line #{line_no}, only #{content.size} lines in file")
+            insertion_point = content.size
+          else
+            insertion_point = line_no
           end
         end
         content.insert(insertion_point, data)
