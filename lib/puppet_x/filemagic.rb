@@ -267,84 +267,42 @@ module PuppetX
       if delete
         # If we deleted based on the match, then target is already gone, otherwise if we are removing
         # based on `data` remove any lines line
-        content.shift(data_lines.size)
+        data_lines.each { |line|
+          if content[0] == line
+            content.shift
+          end
+        }
       else
         # insert the lines at the start of the file
         content.unshift(data_lines)
       end
 
-
       # write the new content in one go
       writefile(path, content)
     end
 
-    # def self.prepend(path, regex_end, flags, data)
-    #   # read the old content into an array and prepend the required lines
-    #   content = readfile(path)
-    #   found_at = get_match_regex(content, regex_end, flags, false)
-    #
-    #   if found_at > -1
-    #     # Discard from the beginning of the file all lines before and including content[found_at]
-    #     content = content[found_at+1..content.size-1]
-    #   end
-    #
-    #   # insert the lines at the start of the file
-    #   content.unshift(data2lines(data))
-    #
-    #   # write the new content in one go
-    #   writefile(path, content)
-    # end
-    #
-    # def self.unprepend(path, regex_end, flags, data)
-    #   # read the old content into an array and remove the required lines
-    #   content = readfile(path)
-    #   found_at = get_match_regex(content, regex_end, flags,false)
-    #   if found_at > -1
-    #     # Discard from the beginning of the file all lines before and including content[found_at]
-    #     content = content[found_at+1..content.size-1]
-    #   else
-    #     # remove as many lines as we are told to
-    #     content.shift data.size
-    #   end
-    #   # write the new content in one go
-    #   writefile(path, content)
-    # end
 
-    def self.append(path, regex_start, flags, data)
+    def self.append(path, regex_start, flags, data, delete)
       # write the new content in one go
       content = readfile(path)
       found_at = get_match_regex(content, regex_start, flags,true)
+      data_lines = data2lines(data)
 
       if found_at > -1
         # Discard from the end of the file all lines including and after content[found_at]
         content = content[0..found_at-1]
       end
 
-      # perform the append
-      content += data2lines(data)
-      writefile(path, content)
-    end
-
-    def self.unappend(path, regex_start, flags, data)
-      content = readfile(path)
-      found_at = get_match_regex(content, regex_start, flags, true)
-      if found_at > -1
-        # Delete based on regexp (match)
-        #
-        # Discard from the end of the file all lines including and after content[found_at]
-        content = content[0..found_at-1]
+      if delete
+        data_lines.reverse.each { |line|
+          if content[-1].strip == line.strip
+            content.pop
+          end
+        }
       else
-        # Delete based on exact match for `data`
-        lines = data2lines(data)
-        if lines
-          data2lines(data).reverse.each { |line|
-            if content[-1].strip == line.strip
-              content.pop
-            end
-          }
-        end
+        content += data_lines
       end
-      # write the new content in one go
+
       writefile(path, content)
     end
 
