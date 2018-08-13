@@ -30,15 +30,6 @@ fm_replace { "/tmp/foo.txt:insert_top":
   insert_at         => "top"
 }
 
-fm_replace { "/tmp/foo.txt:insert_bottom":
-  ensure            => present,
-  path              => "/tmp/foo.txt",
-  data              => "line inserted at bottom",
-  match             => "will never match",
-  insert_if_missing => true,
-  insert_at         => "bottom"
-}
-
 fm_replace { "/tmp/foo.txt:insert_3":
   ensure            => present,
   path              => "/tmp/foo.txt",
@@ -46,4 +37,23 @@ fm_replace { "/tmp/foo.txt:insert_3":
   match             => "will never match",
   insert_if_missing => true,
   insert_at         => 3,
+}
+
+# handle multiple lines starting "option"
+fm_replace { "/tmp/foo.txt:block of similar lines":
+  ensure            => present,
+  path              => "/tmp/foo.txt",
+  data              => "option foo\noption bar\noption baz",
+  match             => "^option",
+  insert_if_missing => true,
+  insert_at         => "bottom",
+}
+
+fm_replace { "/tmp/foo.txt:insert_bottom":
+  ensure            => present,
+  path              => "/tmp/foo.txt",
+  data              => "line inserted at bottom",
+  match             => "will never match",
+  insert_if_missing => true,
+  insert_at         => "bottom"
 }

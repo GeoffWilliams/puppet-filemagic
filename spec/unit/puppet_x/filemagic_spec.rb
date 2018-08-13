@@ -120,6 +120,12 @@ describe PuppetX::FileMagic do
       ).to be true
     end
 
+    it 'exists? (ensure=>present) detects no need to fire when replacements already applied (multi-line contiguous)' do
+      expect(
+          PuppetX::FileMagic::exists?(TESTCASE[:replaced_multiline], TESTCASE[:multiline_data], '^option', nil, :replace, false)
+      ).to be true
+    end
+
     it 'exists? (ensure=>present) detects need to fire when replacements are needed' do
       expect(
           PuppetX::FileMagic::exists?(TESTCASE[:needs_replace], TESTCASE[:data], 'needs replace', nil, :replace, false)
@@ -163,11 +169,18 @@ describe PuppetX::FileMagic do
 
 
       it 'exists? (ensure=>present) detects no need to fire when replacements already applied' do
+        puts TESTCASE[:replaced_insert]
+        puts TESTCASE[:data]
         expect(
             PuppetX::FileMagic::exists?(TESTCASE[:replaced_insert], TESTCASE[:data], 'gonsky', nil, :replace_insert, false)
         ).to be true
       end
 
+      it 'exists? (ensure=>present) detects no need to fire when replacements already applied (multi-line contiguous)' do
+        expect(
+            PuppetX::FileMagic::exists?(TESTCASE[:replaced_multiline], TESTCASE[:multiline_data], '^option', nil, :replace_insert, false)
+        ).to be true
+      end
 
       it 'exists? (ensure=>absent) detects need to fire when replacements are needed (regexp match)' do
         expect(
@@ -228,24 +241,21 @@ describe PuppetX::FileMagic do
   #
   context "get_match_regex function" do
     it 'finds the index of the first match' do
-      expect(PuppetX::FileMagic::get_match_regex(['a','b','c','b','a'], 'b', nil, true, [])).to be 1
+      expect(PuppetX::FileMagic::get_match_regex(['a','b','c','b','a'], 'b', nil, true,)).to eq 1
     end
 
     it 'finds the index of the last match' do
-      expect(PuppetX::FileMagic::get_match_regex(['a','b','c','b','a'], 'b', nil, false, [])).to be 3
+      expect(PuppetX::FileMagic::get_match_regex(['a','b','c','b','a'], 'b', nil, false,)).to eq 3
     end
 
     it 'returns -1 if no match' do
-      expect(PuppetX::FileMagic::get_match_regex(['a','b'], 'c', nil, false, [])).to be -1
+      expect(PuppetX::FileMagic::get_match_regex(['a','b'], 'c', nil, false)).to eq -1
     end
 
     it 'returns -1 if no regex' do
-     expect(PuppetX::FileMagic::get_match_regex([], false, nil, false, [])).to be -1
+     expect(PuppetX::FileMagic::get_match_regex([], false, nil, false)).to eq -1
     end
 
-    it 'returns -1 if regex matches but is the same as data to replace with' do
-      expect(PuppetX::FileMagic::get_match_regex(['a', 'compress', 'b', 'c'], '^(no)?compress', nil, false, ['compress'])).to be -1
-    end
   end
 
   #
@@ -253,53 +263,78 @@ describe PuppetX::FileMagic do
   #
   context "get_match_lines function" do
     it 'does not error on empty input file or lines' do
-      expect(PuppetX::FileMagic::get_match_lines([], "", 0)).to be 0
+      expect(PuppetX::FileMagic::get_match_lines([], "", 0)[0]).to be 0
     end
 
 
     it 'counts matches at BOF' do
-      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['a', 'b'], -1)).to be -1
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['a', 'b'], -1)[0]).to be -1
+    end
+
+    it 'counts matches at BOF and realises when position is wrong' do
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['b', 'c'], -1)[0]).to be 2
     end
 
     it 'counts matches in MOF' do
-      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['b', 'c'], 0)).to be -1
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['b', 'c'], 0)[0]).to be -1
     end
 
     it 'counts matches at EOF' do
-      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['c', 'd'], 1)).to be -1
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['c', 'd'], 1)[0]).to be -1
+    end
+
+    it 'counts matches at EOF and realises when position is wrong' do
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['b', 'c'], 1)[0]).to be 2
+    end
+
+
+    it 'returns file_lines minus data_lines matches at BOF' do
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['a', 'b'], -1)[1]).to eq ['c','d']
+    end
+
+    it 'returns file_lines minus data_lines matches at MOF' do
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['b', 'c'], 0)[1]).to eq ['a','d']
+    end
+
+    it 'returns file_lines minus data_lines matches at EOF' do
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['c', 'd'], 1)[1]).to eq ['a','b']
+    end
+
+    it 'returns non-empty array of file_lines when no exact match was found' do
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['c', 'x'], 1)[1]).to eq ['a','b','d']
     end
 
     it 'counts partial matches at BOF p1' do
-      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['z', 'b'], -1)).to be 1
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['z', 'b'], -1)[0]).to be 1
     end
 
     it 'counts partial matches at BOF p2' do
-      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['a', 'z'], -1)).to be 1
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['a', 'z'], -1)[0]).to be 1
     end
 
     it 'counts partial matches at BOF p3' do
-      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['b', 'z'], -1)).to be 1
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['b', 'z'], -1)[0]).to be 1
     end
 
     it 'counts partial matches in MOF p1' do
-      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['c', 'z'], 0)).to be 1
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['c', 'z'], 0)[0]).to be 1
     end
 
     it 'counts partial matches in MOF p2' do
-      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['z', 'c'], 0)).to be 1
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['z', 'c'], 0)[0]).to be 1
     end
 
 
     it 'counts partial matches at EOF p1 ' do
-      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['c', 'z'], 1)).to be 1
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['c', 'z'], 1)[0]).to be 1
     end
 
     it 'counts partial matches at EOF p2 ' do
-      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['z', 'd'], 1)).to be 1
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['z', 'd'], 1)[0]).to be 1
     end
 
     it 'counts partial matches at EOF p3 ' do
-      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['z', 'c'], 1)).to be 1
+      expect(PuppetX::FileMagic::get_match_lines(['a','b','c','d'], ['z', 'c'], 1)[0]).to be 1
     end
 
   end
