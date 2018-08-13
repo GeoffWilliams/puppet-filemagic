@@ -6,10 +6,10 @@ Puppet::Type.type(:fm_prepend).provide(:ruby) do
   end
 
   def create
-    PuppetX::FileMagic::prepend(@resource['path'], @resource['match_end'], @resource['flags'], @resource['data'])
+    PuppetX::FileMagic::prepend(@resource['path'], @resource['match_end'], @resource['flags'], @resource['data'], false)
   end
 
   def destroy
-    PuppetX::FileMagic::unprepend(@resource['path'], @resource['match_end'], @resource['flags'], @resource['data'])
+    PuppetX::FileMagic::prepend(@resource['path'], @resource['match_end'], @resource['flags'], @resource['data'], true)
   end
 end

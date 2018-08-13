@@ -253,44 +253,62 @@ module PuppetX
       exists
     end
 
-    def self.prepend(path, regex_end, flags, data)
+    def self.prepend(path, regex_end, flags, data, delete)
       # read the old content into an array and prepend the required lines
       content = readfile(path)
       found_at = get_match_regex(content, regex_end, flags, false)
+      data_lines = data2lines(data)
 
       if found_at > -1
         # Discard from the beginning of the file all lines before and including content[found_at]
         content = content[found_at+1..content.size-1]
       end
 
-      # insert the lines at the start of the file
-      content.unshift(data2lines(data))
-
-      # write the new content in one go
-      writefile(path, content)
-    end
-
-    def self.unprepend(path, regex_end, flags, data)
-      # read the old content into an array and remove the required lines
-      content = readfile(path)
-      found_at = get_match_regex(content, regex_end, flags,false)
-      if found_at > -1
-        # Discard from the beginning of the file all lines before and including content[found_at]
-        content = content[found_at+1..content.size-1]
+      if delete
+        # If we deleted based on the match, then target is already gone, otherwise if we are removing
+        # based on `data` remove any lines line
+        content.shift(data_lines.size)
       else
-        # remove as many lines as we are told to
-        data2lines(data).each { |line|
-          # we double check that the lines read are still valid since we
-          # checked with exists? to prevent possible race conditions (although
-          # we could still encounter them since there's no locking)
-          if content[0] == line
-            content.shift
-          end
-        }
+        # insert the lines at the start of the file
+        content.unshift(data_lines)
       end
+
+
       # write the new content in one go
       writefile(path, content)
     end
+
+    # def self.prepend(path, regex_end, flags, data)
+    #   # read the old content into an array and prepend the required lines
+    #   content = readfile(path)
+    #   found_at = get_match_regex(content, regex_end, flags, false)
+    #
+    #   if found_at > -1
+    #     # Discard from the beginning of the file all lines before and including content[found_at]
+    #     content = content[found_at+1..content.size-1]
+    #   end
+    #
+    #   # insert the lines at the start of the file
+    #   content.unshift(data2lines(data))
+    #
+    #   # write the new content in one go
+    #   writefile(path, content)
+    # end
+    #
+    # def self.unprepend(path, regex_end, flags, data)
+    #   # read the old content into an array and remove the required lines
+    #   content = readfile(path)
+    #   found_at = get_match_regex(content, regex_end, flags,false)
+    #   if found_at > -1
+    #     # Discard from the beginning of the file all lines before and including content[found_at]
+    #     content = content[found_at+1..content.size-1]
+    #   else
+    #     # remove as many lines as we are told to
+    #     content.shift data.size
+    #   end
+    #   # write the new content in one go
+    #   writefile(path, content)
+    # end
 
     def self.append(path, regex_start, flags, data)
       # write the new content in one go
