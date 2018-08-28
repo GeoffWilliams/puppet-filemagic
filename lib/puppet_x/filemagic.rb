@@ -176,8 +176,6 @@ module PuppetX
     # @param data Lines of data to look for.  If (CR)LF character found, newlines
     #   will be inserted or you can just pass an array
     # @param regex Regular expression to match or false to skip
-    # @param position Where to look for a match - -1 top of file, 0 sandwich,
-    #   +1 bottom of file
     # @param check_type what kind of check are we doing?  :present, :absent
     def self.exists?(path, data, regex, flags, check_type, check_for_absent)
       data_lines = data2lines(data)

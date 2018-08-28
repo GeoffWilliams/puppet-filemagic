@@ -1,3 +1,7 @@
+# .travis.yml
+#
+# To debug travis locally:
+# https://docs.travis-ci.com/user/common-build-problems/#Running-a-Container-Based-Docker-Image-Locally
 ---
 sudo: false
 language: ruby

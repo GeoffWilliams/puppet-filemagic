@@ -1,6 +1,10 @@
 Puppet::Type.newtype(:fm_replace) do
-  @doc = "Replace one instance of /regex/ in a text file with `data` and remove all other instances. Note that this works
-like a line-by-line find and replace. If there is nothing to replace then no change will be made! (use file_line for that)"
+  desc <<-DESC
+    @summary Replace one instance of /regex/ in a text file with `data` and remove all other instances. 
+
+    This works like a line-by-line find and replace. If there is nothing to replace then no change will
+    be made unless you specify `insert_if_missing`
+  DESC
 
   ensurable do
     desc "Add or remove the requested lines from the file"

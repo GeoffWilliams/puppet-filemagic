@@ -1,6 +1,7 @@
 require 'puppet_x'
 require 'puppet_x/filemagic'
 Puppet::Type.type(:fm_replace).provide(:ruby) do
+  desc "default provider"
   def exists?
     check_type = if @resource['insert_if_missing']
                    :replace_insert

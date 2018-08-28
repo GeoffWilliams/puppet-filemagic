@@ -1,6 +1,7 @@
 require 'puppet_x'
 require 'puppet_x/filemagic'
 Puppet::Type.type(:fm_gsub).provide(:ruby) do
+  desc "default provider"
   def exists?
     PuppetX::FileMagic::exists?(@resource['path'], @resource['data'], @resource['match'], @resource['flags'], :gsub, (@resource['ensure'] == :absent))
   end
